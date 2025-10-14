@@ -1,0 +1,42 @@
+server:
+  port: 8081
+
+keycloak:
+  url: ${KEYCLOAK_URL:http://localhost:8080/realms/realm-demo}
+  host-url: ${KEYCLOAK_HOST_URL:http://localhost:8080/realms/realm-demo}
+  client_id: ${CLIENT_ID:demo}
+
+jwt:
+  auth:
+    converter:
+      resource-id: ${CLIENT_ID:demo}
+      principle-attribute: preferred_username
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${keycloak.host-url}
+          jwk-set-uri: ${keycloak.url}/protocol/openid-connect/certs
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/products-db}
+    username: ${DB_USERNAME:user}
+    password: ${DB_PASSWORD:user}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    show-sql: true
+
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        oauth2: DEBUG
+
+
+

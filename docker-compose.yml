@@ -1,0 +1,44 @@
+services:
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:25.0.5
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=password
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    command:
+      - 'start-dev'
+
+  products-db:
+    container_name: products-db
+    image: "postgres:9.6-alpine"
+    environment:
+      - POSTGRES_DB=products-db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+    volumes:
+      - products_data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+
+  api:
+    build: .
+    container_name: api
+    environment:
+      - KEYCLOAK_URL=http://keycloak:8080/realms/realm-demo
+      - KEYCLOAK_HOST_URL=http://localhost:8080/realms/realm-demo
+      - CLIENT_ID=demo
+      - DB_URL=jdbc:postgresql://products-db:5432/products-db
+      - DB_USERNAME=user
+      - DB_PASSWORD=user
+    ports:
+      - 8081:8081
+    depends_on:
+      - products-db
+
+volumes:
+  keycloak_data:
+  products_data:
